@@ -71,3 +71,33 @@ ggsave("output/fig2_state_heatmap.png", p2, width = 7, height = 11, dpi = 300)
 ggsave("output/fig3_lh_shock.png",      p3, width = 8, height = 6,  dpi = 300)
 
 print(p3)
+
+# ---- Figure 2 (interactive map with year slider) ----
+library(plotly)
+
+state_abb <- c(setNames(state.abb, state.name), "District of Columbia" = "DC")
+
+map_df <- state |>
+  mutate(code = state_abb[state],
+         year_lab = ifelse(YEAR == 2026, "2026*", as.character(YEAR)))
+
+p_map <- plot_geo(map_df, locationmode = "USA-states") |>
+  add_trace(
+    type = "choropleth",
+    locations = ~code, z = ~ur, frame = ~year_lab,
+    zmin = min(map_df$ur), zmax = max(map_df$ur),     # same color scale every year
+    colors = viridisLite::magma(100, direction = -1),
+    text = ~sprintf("<b>%s, %s</b><br>Unemployment rate: %.1f%%<br>LFPR: %.1f%%<br>Sample size: %s",
+                    state, year_lab, ur * 100, lfpr * 100, format(n, big.mark = ",")),
+    hoverinfo = "text",
+    marker = list(line = list(color = "white", width = 0.5)),
+    colorbar = list(title = "Unemployment<br>rate", tickformat = ".0%")
+  ) |>
+  layout(title = "Unemployment rate by state, 2019-2026",
+         geo = list(scope = "usa", projection = list(type = "albers usa"))) |>
+  animation_opts(frame = 800, redraw = TRUE) |>
+  animation_slider(currentvalue = list(prefix = "Year: "))
+
+htmlwidgets::saveWidget(p_map, "output/fig2_state_map_interactive.html",
+                        selfcontained = TRUE)
+p_map
