@@ -12,14 +12,14 @@ code/
 data/
   raw/            # IPUMS extract (not tracked; see below)
   processed/      # Aggregated series used for the figures
-output/           # Figures (PNG)
+output/           # Figures (PNG) and interactive state map (HTML)
 ```
 
 ## How to replicate
 
 1. Register for an IPUMS account at https://cps.ipums.org and create an API key at https://account.ipums.org/api_keys.
 2. In R, save the key once: `ipumsr::set_ipums_api_key("YOUR_KEY", save = TRUE)`, then restart R.
-3. Install packages: `install.packages(c("ipumsr", "dplyr", "tidyr", "ggplot2"))`.
+3. Install packages: `install.packages(c("ipumsr", "dplyr", "tidyr", "ggplot2", "plotly"))`.
 4. Open `blog3-cps.Rproj` and run the scripts in order: `01_download.R`, `02_clean.R`, `03_figures.R`.
 
 Raw microdata are not included because of file size and IPUMS redistribution terms. `01_download.R` recreates the extract.
